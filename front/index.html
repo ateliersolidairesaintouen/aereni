@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+
+</head>
+<body>
+
+  <div id="value">
+    <div id="pm10" v-bind:style="{ backgroundColor: value.data.pm10.color}">
+      PM 10  : {{ value.data.pm10.value }} µg/m³
+    </div>
+    <div id="pm25" v-bind:style="{ backgroundColor: value.data.pm10.color}">
+      PM 2.5 : {{ value.data.pm25.value }} µg/m³
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+  <script>
+    var value = new Vue({
+      el: '#value',
+      data () {
+        return {
+          value: null,
+        }
+      },
+      mounted () {
+      axios
+        .get('https://api.capteurs.atelier-solidaire-saint-ouen.org/avg')
+        .then(response => (this.value = response))
+      }
+    })
+  </script>
+</body>
+</html>
