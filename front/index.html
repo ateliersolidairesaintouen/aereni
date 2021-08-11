@@ -1,19 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My first Vue app</title>
+  <title>PM</title>
+  <meta charset="utf-8"/>
   <script src="https://unpkg.com/vue"></script>
-  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
-
+  <style type="text/css"> 
+    .title {
+      margin-right: 15px;
+      color: #bbbec4; 
+      font-family: monospace;
+      text-align: right;
+      line-height: 3em;
+      font-size: 0.7em;
+    }
+    #value {
+      height: 250px;
+      width: 500px;
+      color: #ffffff; 
+    }
+    #pm10 {
+      position: absolute;
+      height: 140px;
+      width: 240px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      float: right;
+      color: #ffffff; 
+      text-align: center;
+      line-height: 2em;
+      font-size: 2em;
+    }
+    #pm25 {
+      height: 140px;
+      width: 240px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      float: right;
+      color: #ffffff; 
+      text-align: center;
+      line-height: 2em;
+      font-size: 2em;
+    }
+    em {
+      font-size: 0.5em;
+    }
+  </style>
 </head>
 <body>
 
   <div id="value">
     <div id="pm10" v-bind:style="{ backgroundColor: value.data.pm10.color}">
-      PM 10  : {{ value.data.pm10.value }} µg/m³
+      <div class="title"><span title="Particules en suspension de 10µm">PM 10</span></div>
+      <div>{{ value.data.pm10.value }} <em>µg/m³</em></div>
     </div>
     <div id="pm25" v-bind:style="{ backgroundColor: value.data.pm10.color}">
-      PM 2.5 : {{ value.data.pm25.value }} µg/m³
+      <div class="title"><span title="Particules en suspension de 2.5µm">PM 2.5</span></div>
+      <div>{{ value.data.pm25.value }} <em>µg/m³</em></div>
     </div>
   </div>
 
