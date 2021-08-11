@@ -5,11 +5,8 @@ from flask import Flask
 from flask_influxdb import InfluxDB
 from flask import jsonify
 
-from flask_cors import CORS
-
 
 app = Flask(__name__)
-CORS(app)
 app.config.from_pyfile("aereni.cfg")
 influx = InfluxDB()
 
