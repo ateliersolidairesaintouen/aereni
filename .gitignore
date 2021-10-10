@@ -1,0 +1,9 @@
+.idea
+.DS_Store
+*.pyc
+*.log
+/tmp
+.cache/
+/src/
+*/venv
+*.cfg
