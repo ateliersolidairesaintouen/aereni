@@ -14,17 +14,13 @@ class Station:
     # a node_id uniquely identify a location where we installed a station
     node_id: str = None
     user: str = None  # identify the owner of the node (!= owner of the Station)
-    address: str = None
-    floor: int = None
+    height: int = None  # in meters
     lat: Decimal = None
     lon: Decimal = None
     indoor: bool = False
 
     # if true, the data-points emitted by the station are considered real
     production: bool = False
-
-    # identify the owner of the station (e.g atso, ben...)
-    owner: str = None
 
 
 @dataclass
