@@ -25,7 +25,7 @@
       border-radius: 10px;
       margin-bottom: 30px;
       float: right;
-      color: #ffffff; 
+      color: #ffffff;
       text-align: center;
       line-height: 2em;
       font-size: 2em;
@@ -49,13 +49,13 @@
 <body>
 
   <div id="value">
-    <div id="pm10" v-bind:style="{ backgroundColor: value.data.pm10.color}">
+    <div id="pm10" v-bind:style="{ backgroundColor: value.data.colors.pm10}">
       <div class="title"><span title="Particules en suspension de 10µm">PM 10</span></div>
-      <div>{{ value.data.pm10.value }} <em>µg/m³</em></div>
+      <div>{{ value.data.measures.pm10 }} <em>µg/m³</em></div>
     </div>
-    <div id="pm25" v-bind:style="{ backgroundColor: value.data.pm10.color}">
+    <div id="pm25" v-bind:style="{ backgroundColor: value.data.colors.pm25}">
       <div class="title"><span title="Particules en suspension de 2.5µm">PM 2.5</span></div>
-      <div>{{ value.data.pm25.value }} <em>µg/m³</em></div>
+      <div>{{ value.data.measures.pm25 }} <em>µg/m³</em></div>
     </div>
   </div>
 
@@ -71,7 +71,7 @@
       },
       mounted () {
       axios
-        .get('https://api.capteurs.atelier-solidaire-saint-ouen.org/avg')
+        .get('http://localhost:5000/stats/average?production=false')
         .then(response => (this.value = response))
       }
     })
