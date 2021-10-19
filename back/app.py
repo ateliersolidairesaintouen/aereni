@@ -1,60 +1,29 @@
-#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-from flask import Flask, jsonify
-from flask import request
+from flask import Flask
 from flask_cors import CORS
+from sqlalchemy_utils import database_exists
 
-from back import influx
-from back.inventory import get_station
-from back.models import parse_esp_json
-
-app = Flask(__name__)
-app.config.from_pyfile("aereni.cfg")
-CORS(app)
+from back.databases import sqlite, influx
+from back.ingest import ingest_blueprint
+from back.inventory import inventory_blueprint, setup_inventory
+from back.stats import stats_blueprint
 
 
-@app.post("/ingest")
-def ingest():
-    print(request.data)
-    if not request.is_json:
-        return jsonify({"error": 400, "message": "Invalid request"}), 400
-
-    data_point = parse_esp_json(request.json)
-    station = get_station(data_point.esp_id)
-    influx.write(data_point, station)
-
-    return jsonify({"status": "success"})
-
-
-def pm_color(value):
-    color = None
-    if value < 51:
-        color = 'rgba( 0, 153, 102,.95)'  # Vert 0-50
-    elif value < 101:
-        color = 'rgba( 255, 222, 51,.95)'  # Jaune 51-100
-    elif value < 151:
-        color = 'rgba( 255, 153, 51,.95)'  # Orange 101-150
-    elif value < 201:
-        color = 'rgba( 204, 0, 51,.95)'  # Rouge 151-200
-    elif value < 301:
-        color = 'rgba( 102, 0, 153,.95)'  # Violet 201-300
-    elif value > 301:
-        color = 'rgba( 126, 0, 35,.95)'  # Marron 301+
-    return color
+def create_app():
+    app = Flask(__name__)
+    app.config.from_pyfile("aereni.cfg")
+    sqlite.init_app(app)
+    influx.init_app(app)
+    CORS(app)
+    app.register_blueprint(ingest_blueprint)
+    app.register_blueprint(stats_blueprint)
+    app.register_blueprint(inventory_blueprint)
+    return app
 
 
-@app.get("/stats/average")
-def average():
-    production = request.args.get('production', True, type=lambda v: v.lower() == 'true')
-    measures = influx.last_average(production=production)
-    return jsonify({
-        'measures': measures,
-        'colors': {
-            'pm25': pm_color(measures['pm25']),
-            'pm10': pm_color(measures['pm10'])
-        }
-    })
-
-
-app.run(host='0.0.0.0')
+if __name__ == '__main__':
+    app = create_app()
+    with app.app_context():
+        if not database_exists(sqlite.engine.url):
+            print(f'initialize database {sqlite.engine.url}')
+            setup_inventory()
+    app.run(host='0.0.0.0')

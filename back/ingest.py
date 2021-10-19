@@ -2,25 +2,11 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict
 
+from flask import Blueprint, jsonify, request
+from back.databases import influx
+from back.inventory import get_station_by_esp_id, Station
 
-@dataclass
-class Station:
-    # aereni_id uniquely identify a station
-    aereni_id: str
-
-    # esp_id depends on the current esp installed in the station, it can vary if we replace the esp after a failure
-    esp_id: str
-
-    # a node_id uniquely identify a location where we installed a station
-    node_id: str = None
-    user: str = None  # identify the owner of the node (!= owner of the Station)
-    height: int = None  # in meters
-    lat: Decimal = None
-    lon: Decimal = None
-    indoor: bool = False
-
-    # if true, the data-points emitted by the station are considered real
-    production: bool = False
+ingest_blueprint = Blueprint('ingest', __name__)
 
 
 @dataclass
@@ -67,3 +53,54 @@ def parse_esp_json(json: Dict) -> DataPoint:
             p.signal = int(data_value['value'])
 
     return p
+
+
+def write_to_influx(p: DataPoint, s: Station):
+    tags = {
+        "esp_id": s.esp_id,
+        "aereni_id": s.aereni_id,
+        "node_id": s.node_id,
+        "indoor": s.indoor,
+        "production": s.production,
+        "user": s.user,
+    }
+    influx.write_points([
+        {
+            "measurement": "production" if s.production else "test",
+            "fields": {
+                "pm25": p.pm25,
+                "pm10": p.pm10,
+                "temperature": p.temperature,
+                "humidity": p.humidity,
+                "pressure": p.pressure
+            },
+            "tags": tags
+        },
+        {
+            "measurement": "monitoring",
+            "fields": {
+                "software_version": p.software_version,
+                "signal": p.signal,
+                "min_micro": p.min_micro,
+                "max_micro": p.max_micro,
+                "samples": p.samples
+            },
+            "tags": tags
+        }
+    ])
+
+
+@ingest_blueprint.post("/ingest")
+def api_ingest():
+    if not request.is_json:
+        return jsonify({"error": 400, "message": "Invalid request"}), 400
+
+    data_point = parse_esp_json(request.json)
+    station = get_station_by_esp_id(data_point.esp_id)
+    if station is None:
+        print("error: dropping a data point because the esp_id is not known in the inventory", request.data)
+        return jsonify({"error": 400, "message": f"There is no station with esp_id={data_point.esp_id}"}), 400
+
+    write_to_influx(data_point, station)
+
+    return jsonify({"status": "success"})
