@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import SQLAlchemyError
 
-from back.databases import sqlite
+from aereni.databases import sqlite
 
 inventory_blueprint = Blueprint('inventory', __name__)
 

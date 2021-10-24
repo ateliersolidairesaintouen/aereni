@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from back.databases import influx
+from aereni.databases import influx
 
 stats_blueprint = Blueprint('stats', __name__)
 

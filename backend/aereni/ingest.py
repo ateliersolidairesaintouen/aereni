@@ -3,8 +3,8 @@ from decimal import Decimal
 from typing import Dict
 
 from flask import Blueprint, jsonify, request
-from back.databases import influx
-from back.inventory import get_station_by_esp_id, Station
+from aereni.databases import influx
+from aereni.inventory import get_station_by_esp_id, Station
 
 ingest_blueprint = Blueprint('ingest', __name__)
 

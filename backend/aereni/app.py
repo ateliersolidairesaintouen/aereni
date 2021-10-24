@@ -1,16 +1,20 @@
+import os
+
 from flask import Flask
 from flask_cors import CORS
 from sqlalchemy_utils import database_exists
 
-from back.databases import sqlite, influx
-from back.ingest import ingest_blueprint
-from back.inventory import inventory_blueprint, setup_inventory
-from back.stats import stats_blueprint
+from aereni.databases import sqlite, influx
+from aereni.ingest import ingest_blueprint
+from aereni.inventory import inventory_blueprint, setup_inventory
+from aereni.stats import stats_blueprint
+
+AERENI_CONFIG = os.environ.get('AERENI_CONFIG', "../aereni.cfg")
 
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_pyfile("aereni.cfg")
+    app.config.from_pyfile(AERENI_CONFIG)
     sqlite.init_app(app)
     influx.init_app(app)
     CORS(app)
