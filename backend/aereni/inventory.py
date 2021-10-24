@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from sqlalchemy.exc import SQLAlchemyError
 
 from aereni.databases import sqlite
@@ -12,8 +12,8 @@ inventory_blueprint = Blueprint('inventory', __name__)
 class Station(sqlite.Model):
     __tablename__ = 'station'
 
-    # aereni_id uniquely identify a station
-    aereni_id: str = sqlite.Column(sqlite.String, primary_key=True)
+    # uniquely identify a station
+    id: str = sqlite.Column(sqlite.String, primary_key=True)
 
     # name of the Station
     name: str = sqlite.Column(sqlite.String, unique=True, nullable=False)
@@ -50,7 +50,7 @@ def setup_inventory():
     #### test data ###
     s1 = Station(
         name='Station 11',
-        aereni_id='11', esp_id='15002893',
+        id='11', esp_id='15002893',
         indoor=True, production=False,
         node_id="3435468416864",
         user='barth', address="XXXXX",
@@ -66,14 +66,17 @@ def get_station_by_esp_id(esp_id: str) -> Station:
 
 @inventory_blueprint.get("/inventory/stations")
 def api_list_stations():
-    return jsonify(sqlite.session.query(Station).all())
+    all_stations = sqlite.session.query(Station).all()
+    resp = make_response(jsonify(all_stations))
+    resp.headers['X-Total-Count'] = len(all_stations)
+    return resp
 
 
-@inventory_blueprint.get("/inventory/stations/<aereni_id>")
-def api_get_station(aereni_id: str):
-    station = sqlite.session.query(Station).get(aereni_id)
+@inventory_blueprint.get("/inventory/stations/<id>")
+def api_get_station(id: str):
+    station = sqlite.session.query(Station).get(id)
     if station is None:
-        return jsonify({"error": 404, "message": f"There is no station with aereni_id={aereni_id}"}), 404
+        return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
     return jsonify(station)
 
 
@@ -89,17 +92,17 @@ def api_create_station():
     except SQLAlchemyError as e:
         return jsonify({"error": 400, "message": str(e)}), 400
 
-    return jsonify({"status": "success"})
+    return jsonify(station)
 
 
-@inventory_blueprint.patch("/inventory/stations/<aereni_id>")
-def api_partial_update_station(aereni_id: str):
+@inventory_blueprint.patch("/inventory/stations/<id>")
+def api_partial_update_station(id: str):
     if not request.is_json:
         return jsonify({"error": 400, "message": "Invalid request"}), 400
 
-    station = sqlite.session.query(Station).get(aereni_id)
+    station = sqlite.session.query(Station).get(id)
     if station is None:
-        return jsonify({"error": 404, "message": f"There is no station with aereni_id={aereni_id}"}), 404
+        return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
 
     for key, value in request.json.items():
         if not hasattr(station, key):
@@ -111,14 +114,14 @@ def api_partial_update_station(aereni_id: str):
     except SQLAlchemyError as e:
         return jsonify({"error": 400, "message": str(e)}), 400
 
-    return jsonify({"status": "success"})
+    return jsonify(station)
 
 
-@inventory_blueprint.delete("/inventory/stations/<aereni_id>")
-def api_delete_station(aereni_id: str):
-    count = Station.query.filter_by(aereni_id=aereni_id).delete()
+@inventory_blueprint.delete("/inventory/stations/<id>")
+def api_delete_station(id: str):
+    count = Station.query.filter_by(id=id).delete()
     if count == 0:
-        return jsonify({"error": 404, "message": f"There is no station with aereni_id={aereni_id}"}), 404
+        return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
     try:
         sqlite.session.commit()
     except SQLAlchemyError as e:

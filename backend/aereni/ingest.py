@@ -58,7 +58,7 @@ def parse_esp_json(json: Dict) -> DataPoint:
 def write_to_influx(p: DataPoint, s: Station):
     tags = {
         "esp_id": s.esp_id,
-        "aereni_id": s.aereni_id,
+        "station_id": s.id,
         "node_id": s.node_id,
         "indoor": s.indoor,
         "production": s.production,

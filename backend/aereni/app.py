@@ -17,7 +17,7 @@ def create_app():
     app.config.from_pyfile(AERENI_CONFIG)
     sqlite.init_app(app)
     influx.init_app(app)
-    CORS(app)
+    CORS(app, expose_headers=['X-Total-Count', 'Authorization'], supports_credentials=True)
     app.register_blueprint(ingest_blueprint)
     app.register_blueprint(stats_blueprint)
     app.register_blueprint(inventory_blueprint)
