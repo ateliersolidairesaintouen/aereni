@@ -40,6 +40,12 @@ sudo apt-get install -y nodejs
 sudo npm install --global yarn
 ```
 
+Configure :
+```
+cp .env.example .env
+# edit .env
+```
+
 Build the app (static html) :
 ```
 cd /srv/aereni/admin
