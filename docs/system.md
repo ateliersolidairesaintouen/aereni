@@ -1,5 +1,12 @@
 # Installation systeme
 
+## Global
+
+```
+apt update
+apt install sqlite3 nginx influxdb grafana  python3-pip python3-virtualenv certbot python3-certbot-nginx
+```
+
 ## Influxdb
 https://docs.influxdata.com/influxdb/v1.8/introduction/install/#influxdb-oss-installation-requirements
 
@@ -19,7 +26,6 @@ wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
 echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
 
 ```
-
 
 ## Admin web UI
 
@@ -44,13 +50,20 @@ yarn build
 Content root for nginx is : `/srv/aereni/admin/build`
 
 
-## Global
+## Backend API
 
 ```
-apt update
-apt install sqlite3 nginx influxdb grafana python3-pip python3-virtualenv certbot python3-certbot-nginx
+cd /srv/aereni/backend
+
+virtualenv venv
+source venv/bin/activate
+python --version # should be 3.8 !
+pip install -r requirements.txt
+
+cp aereni.cfg.example aereni.cfg
+# edit aereni.cfg
+
+sudo ln -s $(pwd)/aereni-backend.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable aereni-backend.service 
 ```
-
-
-
-
