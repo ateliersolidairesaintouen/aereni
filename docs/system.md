@@ -21,16 +21,28 @@ echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/a
 ```
 
 
-## NodeJS
+## Admin web UI
 
 https://github.com/nodesource/distributions/blob/master/README.md#debinstall
 
-as root :
+(As ubuntu user)
+
+Install nodejs & yarn :
 ```
-curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-apt-get install -y nodejs
-npm install --global yarn
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install --global yarn
 ```
+
+Build the app (static html) :
+```
+cd /srv/aereni/admin
+yarn install
+yarn build
+```
+
+Content root for nginx is : `/srv/aereni/admin/build`
+
 
 ## Global
 
@@ -38,5 +50,7 @@ npm install --global yarn
 apt update
 apt install sqlite3 nginx influxdb grafana python3-pip python3-virtualenv certbot python3-certbot-nginx
 ```
+
+
 
 
