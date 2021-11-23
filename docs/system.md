@@ -16,6 +16,10 @@ export DISTRIB_ID=$(lsb_release -si); export DISTRIB_CODENAME=$(lsb_release -sc)
 echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdb.gpg] https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" > /etc/apt/sources.list.d/influxdb.list
 ```
 
+```
+CREATE USER <username> WITH PASSWORD '<password>' WITH ALL PRIVILEGES
+```
+
 ## Grafana
 
 ```
