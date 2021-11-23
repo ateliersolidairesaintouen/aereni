@@ -1,0 +1,13 @@
+[Unit]
+Description=Aereni backend
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/srv/aereni/backend/venv/bin/python -m aereni.app
+Restart=always
+User=ubuntu
+WorkingDirectory=/srv/aereni/backend/
+
+[Install]
+WantedBy=multi-user.target
