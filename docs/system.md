@@ -24,5 +24,6 @@ echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/a
 
 ```
 apt update
-apt install sqlite3 nginx influxdb grafana python3-pip python3-virtualenv
+apt install sqlite3 nginx influxdb grafana python3-pip python3-virtualenv certbot python3-certbot-nginx
 ```
+
