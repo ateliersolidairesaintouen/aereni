@@ -19,6 +19,11 @@ function buildHeaders() {
   return headers;
 }
 
+function sortBy(field, order) {
+  return (a,b) => (a[field] > b[field]) ? (order === "ASC" ? 1 : -1) : ((b[field] > a[field]) ? (order === "ASC" ? -1 : 1) : 0)
+}
+
+
 export const authProvider = {
   login: ({ username, password }) => {
     localStorage.setItem("username", username);
@@ -62,9 +67,12 @@ export const dataProvider = {
     };
     const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
+
+    console.log(params)
+
     return httpClient(url, { method: "GET", headers: buildHeaders() }).then(
       ({ headers, json }) => ({
-        data: json,
+        data: json.sort(sortBy(field, order)),
         total: parseInt(headers.get("x-total-count"), 10),
       })
     );
