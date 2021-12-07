@@ -1,3 +1,4 @@
+import traceback
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict
@@ -92,15 +93,21 @@ def write_to_influx(p: DataPoint, s: Station):
 
 @ingest_blueprint.post("/ingest")
 def api_ingest():
-    if not request.is_json:
-        return jsonify({"error": 400, "message": "Invalid request"}), 400
+    try:
+        if not request.is_json:
+            return jsonify({"error": 400, "message": "Invalid request"}), 400
 
-    data_point = parse_esp_json(request.json)
-    station = get_station_by_esp_id(data_point.esp_id)
-    if station is None:
-        print("error: dropping a data point because the esp_id is not known in the inventory", request.data)
-        return jsonify({"error": 400, "message": f"There is no station with esp_id={data_point.esp_id}"}), 400
+        data_point = parse_esp_json(request.json)
+        station = get_station_by_esp_id(data_point.esp_id)
+        if station is None:
+            print("error: dropping a data point because the esp_id is not known in the inventory", request.data)
+            return jsonify({"error": 400, "message": f"There is no station with esp_id={data_point.esp_id}"}), 400
 
-    write_to_influx(data_point, station)
+        write_to_influx(data_point, station)
 
-    return jsonify({"status": "success"})
+        return jsonify({"status": "success"})
+
+    except Exception as e:
+        print("!!!!!! INGEST ERROR !!!!!! please fix !!!! <3")
+        print(traceback.format_exc())
+        raise e
