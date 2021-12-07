@@ -36,6 +36,7 @@ const StationList = (props) => (
       <BooleanField source="indoor" />
 
       <BooleanField source="production" />
+      <TextField multiline source="comment" />
     </Datagrid>
   </List>
 );
@@ -59,6 +60,7 @@ export const StationEdit = (props) => (
       <BooleanInput source="indoor" />
 
       <BooleanInput source="production" />
+      <TextInput multiline source="comment" />
     </SimpleForm>
   </Edit>
 );
@@ -82,6 +84,7 @@ export const StationCreate= (props) => (
       <BooleanInput source="indoor" />
 
       <BooleanInput source="production" />
+      <TextInput source="comment" />
     </SimpleForm>
   </Create>
 );

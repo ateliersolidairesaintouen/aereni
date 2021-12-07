@@ -41,6 +41,8 @@ class Station(sqlite.Model):
     # identify the owner of the station (e.g atso, ben...)
     owner: str = sqlite.Column(sqlite.String, unique=False, nullable=False, default="ATSO")
 
+    comment: str = sqlite.Column(sqlite.String, unique=False, nullable=True, default="")
+
     def __repr__(self):
         return '<Station %r>' % self.name
 
