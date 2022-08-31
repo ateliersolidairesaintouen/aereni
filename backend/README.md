@@ -4,13 +4,13 @@ Aereni Backend
 ## Development setup
 
 Requirements :
-- python >= 3.6 (tested with 3.9)
+- python >= 3.6 (tested with 3.10)
 - pip and virtualenv
 - influxdb 1.8
 
 Create / load virtualenv :
 
-    virtualenv -p $(which python3.9) venv
+    virtualenv -p $(which python3.10) venv
     source venv/bin/activate
 
 Download dependencies :
