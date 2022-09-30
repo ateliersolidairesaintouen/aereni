@@ -57,3 +57,61 @@ def api_average():
             'pm10': pm_color(measures['pm10'])
         }
     })
+
+
+@stats_blueprint.get("/stats/last_measurement")
+def api_last_measurement():
+
+    exemple = """
+    [
+        {
+            "id": "1",
+            "name": "Mairie",
+            "long": 48.911856,
+            "lat": 2.333764,
+            "pm25": 45,
+            "pm10": 10,
+            "temperature": 8,
+            "pressure": 42,
+            "humidity": 42,
+            "date": "29/09/2022 21:45"
+        },
+        {
+            "id": "2",
+            "name": "Atelier",
+            "long": 48.92,
+            "lat": 2.333,
+            "pm25": 20,
+            "pm10": 10,
+            "temperature": 8,
+            "pressure": 42,
+            "humidity": 42,
+            "date": "29/09/2022 21:42"
+        },
+        {
+            "id": "3",
+            "name": "ID 3",
+            "long": 48.902,
+            "lat": 2.34,
+            "pm25": 10,
+            "pm10": 10,
+            "temperature": 8,
+            "pressure": 42,
+            "humidity": 42,
+            "date": "09/02/2022 21:45"
+        },
+        {
+            "id": "4",
+            "name": "ID 4",
+            "long": 48.905,
+            "lat": 2.32,
+            "pm25": 80,
+            "pm10": 10,
+            "temperature": 8,
+            "pressure": 42,
+            "humidity": 42,
+            "date": "09/02/2022 21:48"
+        }
+    ]"""
+
+    return jsonify(exemple)
