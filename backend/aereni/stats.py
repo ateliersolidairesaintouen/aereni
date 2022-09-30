@@ -62,8 +62,7 @@ def api_average():
 @stats_blueprint.get("/stats/last_measurement")
 def api_last_measurement():
 
-    exemple = """
-    [
+    exemple = [
         {
             "id": "1",
             "name": "Mairie",
@@ -111,7 +110,6 @@ def api_last_measurement():
             "pressure": 42,
             "humidity": 42,
             "date": "09/02/2022 21:48"
-        }
-    ]"""
+        }]
 
     return jsonify(exemple)
