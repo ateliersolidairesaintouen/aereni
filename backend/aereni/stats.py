@@ -121,14 +121,14 @@ def api_last_measurement():
             "type": "Feature",
             "properties": {
                 "name": "Atelier",
-                "temp": random.randint(0, 46) +" C°",
-                "hum": random.randint(0, 100) + " %",
-                "pm100": random.randint(10, 50),
-                "pm25": random.randint(0, 25),
+                "temp": "46 C°",
+                "hum": "56 %",
+                "pm100": 50,
+                "pm25": 25,
                 "_umap_options": {
-                "color": "Green",
-                "popupTemplate": "Table",
-                "showLabel": null
+                    "color": "Green",
+                    "popupTemplate": "Table",
+                    "showLabel": null
                 }
             },
             "geometry": {
