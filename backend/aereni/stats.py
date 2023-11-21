@@ -112,4 +112,78 @@ def api_last_measurement():
             "date": "09/02/2022 21:48"
         }]
 
+
+    import random
+    exemple = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+            "type": "Feature",
+            "properties": {
+                "name": "Atelier",
+                "temp": random.randint(0, 46) +" C°",
+                "hum": random.randint(0, 100) + " %",
+                "pm100": random.randint(10, 50),
+                "pm25": random.randint(0, 25),
+                "_umap_options": {
+                "color": "Green",
+                "popupTemplate": "Table",
+                "showLabel": null
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                2.335914,
+                48.916965
+                ]
+            }
+            },
+            {
+            "type": "Feature",
+            "properties": {
+                "name": "Mairie SO",
+                "temp": "12.0 C°",
+                "hum": "11 %",
+                "pm100": 12,
+                "pm25": 12,
+                "_umap_options": {
+                "color": "Green",
+                "popupTemplate": "Table",
+                "showLabel": null
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                2.333758,
+                48.912036
+                ]
+            }
+            },
+            {
+            "type": "Feature",
+            "properties": {
+                "name": "Michelet / LAndy",
+                "temp": "10.0 C°",
+                "hum": "88 %",
+                "pm100": 55,
+                "pm25": 41,
+                "_umap_options": {
+                "color": "Red",
+                "popupTemplate": "Table",
+                "showLabel": null
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                2.344208,
+                48.914011
+                ]
+            }
+            }
+        ]
+        }
+
     return jsonify(exemple)
