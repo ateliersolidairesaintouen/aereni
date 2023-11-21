@@ -23,7 +23,7 @@
     "type":"Feature",
     "properties": {
       "name":"Mairie SO",
-      "temp":"24.0 C°",
+      "temp":"42.0 C°",
       "hum":"61 %",
       "pm100":32,
       "pm25":29,
