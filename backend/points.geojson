@@ -1,0 +1,60 @@
+{
+  "type":"FeatureCollection",
+  "features": [ {
+    "type":"Feature",
+    "properties": {
+      "name":"Atelier SO",
+      "temp":"20.0 C°",
+      "hum":"60 %",
+      "pm100":20,
+      "pm25":16,
+      "_umap_options": {
+        "color": "Green",
+          "popupTemplate": "Table",
+          "showLabel": null
+        }
+    },
+    "geometry": {
+      "type":"Point",
+      "coordinates": [2.335914,48.916965]
+    }
+  },
+  {
+    "type":"Feature",
+    "properties": {
+      "name":"Mairie SO",
+      "temp":"21.0 C°",
+      "hum":"65 %",
+      "pm100":30,
+      "pm25":26,
+      "_umap_options": {
+        "color": "Green",
+          "popupTemplate": "Table",
+          "showLabel": null
+        }
+    },
+      "geometry": {
+        "type":"Point",
+        "coordinates": [2.333758,48.912036]
+      }
+  },
+  {
+    "type":"Feature",
+    "properties": {
+      "name": "Michelet / LAndy",
+      "temp":"15.0 C°",
+      "hum":"80 %",
+      "pm100":50,
+      "pm25":42,
+      "_umap_options": {
+        "color": "Red",
+          "popupTemplate": "Table",
+          "showLabel": null
+        }
+    },
+    "geometry": {
+      "type":"Point",
+      "coordinates": [2.344208,48.914011]
+    }
+  } ]
+}
