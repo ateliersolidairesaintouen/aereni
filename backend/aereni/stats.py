@@ -128,7 +128,6 @@ def api_last_measurement():
                 "_umap_options": {
                     "color": "Green",
                     "popupTemplate": "Table",
-                    "showLabel": null
                 }
             },
             "geometry": {
@@ -150,7 +149,6 @@ def api_last_measurement():
                 "_umap_options": {
                 "color": "Green",
                 "popupTemplate": "Table",
-                "showLabel": null
                 }
             },
             "geometry": {
@@ -172,7 +170,6 @@ def api_last_measurement():
                 "_umap_options": {
                 "color": "Red",
                 "popupTemplate": "Table",
-                "showLabel": null
                 }
             },
             "geometry": {
