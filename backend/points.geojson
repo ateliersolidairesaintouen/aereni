@@ -4,8 +4,8 @@
     "type":"Feature",
     "properties": {
       "name":"Atelier SO",
-      "temp":"20.0 C°",
-      "hum":"60 %",
+      "temp":"22.0 C°",
+      "hum":"58 %",
       "pm100":20,
       "pm25":16,
       "_umap_options": {
@@ -23,10 +23,10 @@
     "type":"Feature",
     "properties": {
       "name":"Mairie SO",
-      "temp":"21.0 C°",
-      "hum":"65 %",
-      "pm100":30,
-      "pm25":26,
+      "temp":"24.0 C°",
+      "hum":"61 %",
+      "pm100":32,
+      "pm25":29,
       "_umap_options": {
         "color": "Green",
           "popupTemplate": "Table",
@@ -42,10 +42,10 @@
     "type":"Feature",
     "properties": {
       "name": "Michelet / LAndy",
-      "temp":"15.0 C°",
-      "hum":"80 %",
-      "pm100":50,
-      "pm25":42,
+      "temp":"10.0 C°",
+      "hum":"88 %",
+      "pm100":55,
+      "pm25":41,
       "_umap_options": {
         "color": "Red",
           "popupTemplate": "Table",
