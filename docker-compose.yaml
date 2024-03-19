@@ -8,7 +8,7 @@ services:
       - GF_SERVER_ROOT_URL=http://my.grafana.server/
       - GF_INSTALL_PLUGINS=grafana-clock-panel
     ports:
-     - '3000:3000'
+     - '3030:3000'
     volumes:
       - grafana-storage:/var/lib/grafana
   influxdb:
