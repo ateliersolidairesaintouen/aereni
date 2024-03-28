@@ -1,4 +1,4 @@
-from flask_influxdb import InfluxDB
+from influxdb_flask import InfluxDB
 from flask_sqlalchemy import SQLAlchemy
 
 sqlite = SQLAlchemy()
