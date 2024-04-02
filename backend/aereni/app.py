@@ -32,4 +32,6 @@ if __name__ == '__main__':
         if not database_exists(sqlite.engine.url):
             print(f'initialize database {sqlite.engine.url}')
             setup_inventory()
+        else:
+            print(f'opening database {sqlite.engine.url}')
     app.run(host='0.0.0.0', port='5000')
