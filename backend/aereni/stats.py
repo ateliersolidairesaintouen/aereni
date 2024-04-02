@@ -1,31 +1,37 @@
 from flask import Blueprint, request, jsonify
+import json
 
+from aereni.inventory import get_station_by_esp_id, Station
 from aereni.databases import influx
 
 stats_blueprint = Blueprint('stats', __name__)
 
 
+#query_api.query(f'SELECT mean(*) FROM {"production" if production else "test"} WHERE time > now() - {duration}').get_points()
 def last_average(duration="10m", production=True):
-    results = list(
-        influx.query(
-            f'SELECT mean(*) FROM {"production" if production else "test"} WHERE time > now() - {duration}').get_points()
-    )
+    query_api = influx.query_api()
 
-    if len(results) == 0:
+    # MARCHE PLUS DEPUIS INFLUXDB 2.0
+
+    results = query_api.query(f'from(bucket: "aereni") |> range(start: -{duration}) |> filter(fn: (r) => r["_measurement"] == "{"production" if production else "test"}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> mean() |> pivot(rowKey: ["_start"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure"])
+
+
+    for r in results:
         return {
-            'pm25': 0,
-            'pm10': 0,
-            'humidity': 0,
-            'temperature': 0,
-            'pressure': 0
+            'pm25': round(r[0], 2),
+            'pm10': round(r[1], 2),
+            'humidity': round(r[2], 2),
+            'temperature': round(r[3], 2),
+            'pressure': round(r[4], 2)
         }
 
+
     return {
-        'pm25': round(results[0]['mean_pm25'], 2),
-        'pm10': round(results[0]['mean_pm10'], 2),
-        'humidity': round(results[0]['mean_humidity'], 2),
-        'temperature': round(results[0]['mean_temperature'], 2),
-        'pressure': round(results[0]['mean_pressure'], 2)
+        'pm25': 0,
+        'pm10': 0,
+        'humidity': 0,
+        'temperature': 0,
+        'pressure': 0
     }
 
 
@@ -58,129 +64,89 @@ def api_average():
         }
     })
 
-
 @stats_blueprint.get("/stats/last_measurement")
 def api_last_measurement():
-
-    exemple = [
-        {
-            "id": "1",
-            "name": "Mairie",
-            "long": 48.911856,
-            "lat": 2.333764,
-            "pm25": 45,
-            "pm10": 10,
-            "temperature": 8,
-            "pressure": 42,
-            "humidity": 42,
-            "date": "29/09/2022 21:45"
-        },
-        {
-            "id": "2",
-            "name": "Atelier",
-            "long": 48.92,
-            "lat": 2.333,
-            "pm25": 20,
-            "pm10": 10,
-            "temperature": 8,
-            "pressure": 42,
-            "humidity": 42,
-            "date": "29/09/2022 21:42"
-        },
-        {
-            "id": "3",
-            "name": "ID 3",
-            "long": 48.902,
-            "lat": 2.34,
-            "pm25": 10,
-            "pm10": 10,
-            "temperature": 8,
-            "pressure": 42,
-            "humidity": 42,
-            "date": "09/02/2022 21:45"
-        },
-        {
-            "id": "4",
-            "name": "ID 4",
-            "long": 48.905,
-            "lat": 2.32,
-            "pm25": 80,
-            "pm10": 10,
-            "temperature": 8,
-            "pressure": 42,
-            "humidity": 42,
-            "date": "09/02/2022 21:48"
-        }]
+    query_api = influx.query_api()
+    results = query_api.query('from(bucket: "aereni") |> range(start: -1h) |> filter(fn: (r) => r["_measurement"] == "test") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
 
 
-    import random
-    exemple = {
+    stations_done = set()
+    data = []
+
+    for r in results:
+        esp_id = r[5]
+        print(r)
+        if esp_id not in stations_done:
+            stations_done.add(esp_id)
+            station = get_station_by_esp_id(esp_id)
+            data.append({
+                'id': station.id,
+                'esp_id': station.esp_id,
+                'name': station.name,
+                'lon': station.lon,
+                'lat': station.lat,
+                'pm25': r[0],
+                'pm10': r[1],
+                'humidity': r[2],
+                'temperature': r[3],
+                'pressure': r[4],
+                'date': r[6]
+            })
+
+    return jsonify(data)
+
+@stats_blueprint.get("/stats/last_measurement_umap")
+def api_last_measurement_umap():
+    query_api = influx.query_api()
+    results = query_api.query('from(bucket: "aereni") |> range(start: -1h) |> filter(fn: (r) => r["_measurement"] == "test") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
+
+
+    stations_done = set()
+    data = []
+
+    for r in results:
+        esp_id = r[5]
+        print(r)
+        if esp_id not in stations_done:
+            stations_done.add(esp_id)
+            station = get_station_by_esp_id(esp_id)
+
+
+            pm25 = r[0] if r[0] else 0.0
+            pm10 = r[1] if r[1] else 0.0
+            humidity = r[2] if r[2] else 0.0
+            temperature = r[3] if r[3] else 0.0
+            pressure = r[4] if r[4] else 0.0
+
+            lon = station.lon if station.lon else "1.00"
+            lat = station.lat if station.lat else "1.00"
+
+
+            data.append({
+                "type": "Feature",
+                "properties": {
+                    "name": station.name,
+                    "temp": temperature,
+                    "hum": humidity,
+                    "pm10": pm10,
+                    "pm25": pm25,
+                    "pressure": pressure,
+                    "_umap_options": {
+                        "color": "Red",
+                        "popupTemplate": "Table",
+                    }
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        float(lon),
+                        float(lat)
+                    ]
+
+                }
+            })
+
+    return jsonify({
         "type": "FeatureCollection",
-        "features": [
-            {
-            "type": "Feature",
-            "properties": {
-                "name": "Atelier",
-                "temp": "46 C°",
-                "hum": "56 %",
-                "pm100": 50,
-                "pm25": 25,
-                "_umap_options": {
-                    "color": "Green",
-                    "popupTemplate": "Table",
-                }
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                2.335914,
-                48.916965
-                ]
-            }
-            },
-            {
-            "type": "Feature",
-            "properties": {
-                "name": "Mairie SO",
-                "temp": "12.0 C°",
-                "hum": "11 %",
-                "pm100": 12,
-                "pm25": 12,
-                "_umap_options": {
-                "color": "Green",
-                "popupTemplate": "Table",
-                }
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                2.333758,
-                48.912036
-                ]
-            }
-            },
-            {
-            "type": "Feature",
-            "properties": {
-                "name": "Michelet / LAndy",
-                "temp": "10.0 C°",
-                "hum": "88 %",
-                "pm100": 55,
-                "pm25": 41,
-                "_umap_options": {
-                "color": "Red",
-                "popupTemplate": "Table",
-                }
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                2.344208,
-                48.914011
-                ]
-            }
-            }
-        ]
-        }
-
-    return jsonify(exemple)
+        "features": data
+    })
