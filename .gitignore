@@ -8,3 +8,5 @@
 */venv
 *.cfg
 *.sqlite
+.python-version
+docker-compose.yaml

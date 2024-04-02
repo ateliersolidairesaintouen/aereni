@@ -4,11 +4,12 @@ from decimal import Decimal
 from typing import Dict
 
 from flask import Blueprint, jsonify, request
+from influxdb_client.client.write_api import SYNCHRONOUS
+from aereni.config import config
 from aereni.databases import influx
 from aereni.inventory import get_station_by_esp_id, Station
 
 ingest_blueprint = Blueprint('ingest', __name__)
-
 
 @dataclass
 class DataPoint:
@@ -27,11 +28,9 @@ class DataPoint:
     # "signal" is the wifi strength
     signal: int = None
 
-
 def parse_esp_json(json: Dict) -> DataPoint:
     """map a json, as sent by the esp, into a proper python object"""
-    p = DataPoint(esp_id=json['esp8266id'],
-                  software_version=json['software_version'])
+    p = DataPoint(esp_id=json['esp8266id'], software_version=json['software_version'])
 
     for data_value in json['sensordatavalues']:
         if data_value['value_type'] == 'SDS_P1':
@@ -65,7 +64,8 @@ def write_to_influx(p: DataPoint, s: Station):
         "production": s.production,
         "user": s.user,
     }
-    influx.write_points([
+
+    point = [
         {
             "measurement": "production" if s.production else "test",
             "fields": {
@@ -88,8 +88,14 @@ def write_to_influx(p: DataPoint, s: Station):
             },
             "tags": tags
         }
-    ])
+    ]
 
+    write_api = influx.write_api(SYNCHRONOUS)
+    write_api.write(
+        config.bucket,
+        config.org,
+        point
+    )
 
 @ingest_blueprint.post("/ingest")
 def api_ingest():
