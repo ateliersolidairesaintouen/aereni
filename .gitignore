@@ -9,4 +9,4 @@
 *.cfg
 *.sqlite
 .python-version
-docker-compose.dev.yaml
+docker-compose.example.yaml
