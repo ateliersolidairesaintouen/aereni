@@ -92,10 +92,8 @@ def api_last_measurement():
 
     return jsonify(data)
 
-@stats_blueprint.get("/stats/history")
-def api_history():
-    id = request.args.get("id", None, type=str)
-    if not id: abort(404)
+@stats_blueprint.get("/stats/history/<id>")
+def api_history(id: str):
     station = get_station_by_id(id)
     if not station: abort(404)
 
