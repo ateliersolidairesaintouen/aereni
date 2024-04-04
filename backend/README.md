@@ -1,6 +1,44 @@
 Aereni Backend
 ==============
 
+## Public API Endpoints
+
+### `/inventory/stations`
+
+Return the list of all the stations.
+
+### `/inventory/stations/<id>`
+
+Return the informations related to a specific station
+
+Parameters :
+- `id` : id of the station.
+
+### `/stats/average`
+
+Return the average measures of all the stations.
+
+Parameters :
+- `production` (`true` or `false`) : station category to use. Default `true`.
+
+### `/stats/last_measurement`
+
+Return the last single measurement of all the stations.
+
+Parameters :
+- `production` (`true` or `false`) : station category to use. `true` by default.
+
+### `/stats/history/<id>`
+
+Return the last measurements of one specific station.
+
+Parameters :
+- `id` : id of the station.
+
+### `/stats/last_measurement_umap`
+
+Same as `/stats/last_measurement` but compatible with the [umap library plateform](https://umap.openstreetmap.fr/fr/).
+
 ## Development setup
 
 Requirements :
