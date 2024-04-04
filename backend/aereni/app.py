@@ -15,6 +15,7 @@ AERENI_CONFIG = os.environ.get('AERENI_CONFIG', "../aereni.cfg")
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile(AERENI_CONFIG)
+    app.config['JSON_SORT_KEYS'] = False
     config.set_config(app.config)
 
     sqlite.init_app(app)

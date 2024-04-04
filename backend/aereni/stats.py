@@ -1,17 +1,14 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 import json
 
-from aereni.inventory import get_station_by_esp_id, Station
+from aereni.inventory import get_station_by_esp_id, get_station_by_id, Station
 from aereni.databases import influx
 
 stats_blueprint = Blueprint('stats', __name__)
 
 
-#query_api.query(f'SELECT mean(*) FROM {"production" if production else "test"} WHERE time > now() - {duration}').get_points()
 def last_average(duration="10m", production=True):
     query_api = influx.query_api()
-
-    # MARCHE PLUS DEPUIS INFLUXDB 2.0
 
     results = query_api.query(f'from(bucket: "aereni") |> range(start: -{duration}) |> filter(fn: (r) => r["_measurement"] == "{"production" if production else "test"}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> mean() |> pivot(rowKey: ["_start"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure"])
 
@@ -94,6 +91,40 @@ def api_last_measurement():
             })
 
     return jsonify(data)
+
+@stats_blueprint.get("/stats/history")
+def api_history():
+    id = request.args.get("id", None, type=str)
+    if not id: abort(404)
+    station = get_station_by_id(id)
+    if not station: abort(404)
+
+    duration = request.args.get("duration", "10m", type=str)
+
+    query_api = influx.query_api()
+
+    results = query_api.query(f'from(bucket: "aereni") |> range(start: -{duration}) |> filter(fn: (r) => r["_measurement"] == "test") |> filter(fn: (r) => r["station_id"] == "{id}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
+
+    data = []
+    for r in results:
+        data.append({
+            'pm25': r[0],
+            'pm10': r[1],
+            'humidity': r[2],
+            'temperature': r[3],
+            'pressure': r[4],
+            'date': r[6]
+        })
+
+    return jsonify({
+        'id': station.id,
+        'esp_id': station.esp_id,
+        'address': station.address,
+        'name': station.name,
+        'lon': station.lon,
+        'lat': station.lat,
+        'data': data
+    })
 
 @stats_blueprint.get("/stats/last_measurement_umap")
 def api_last_measurement_umap():

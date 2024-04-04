@@ -55,6 +55,8 @@ def setup_inventory():
 def get_station_by_esp_id(esp_id: str) -> Station:
     return sqlite.session.query(Station).filter_by(esp_id=esp_id).first()
 
+def get_station_by_id(id: str) -> Station:
+    return sqlite.session.query(Station).filter_by(id=id).first()
 
 @inventory_blueprint.get("/inventory/stations")
 def api_list_stations():
