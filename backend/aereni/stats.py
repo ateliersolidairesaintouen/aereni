@@ -63,8 +63,9 @@ def api_average():
 
 @stats_blueprint.get("/stats/last_measurement")
 def api_last_measurement():
+    production = request.args.get('production', True, type=lambda v: v.lower() == 'true')
     query_api = influx.query_api()
-    results = query_api.query('from(bucket: "aereni") |> range(start: -1h) |> filter(fn: (r) => r["_measurement"] == "test") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
+    results = query_api.query(f'from(bucket: "aereni") |> range(start: -1h) |> filter(fn: (r) => r["_measurement"] == "{"production" if production else "test"}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
 
 
     stations_done = set()
