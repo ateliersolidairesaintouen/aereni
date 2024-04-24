@@ -110,6 +110,7 @@ def api_ingest():
             return jsonify({"error": 400, "message": f"There is no station with esp_id={data_point.esp_id}"}), 400
 
         write_to_influx(data_point, station)
+        print("Ingest", station.name, station.production)
 
         return jsonify({"status": "success"})
 
