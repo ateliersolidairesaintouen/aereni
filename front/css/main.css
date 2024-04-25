@@ -1,3 +1,17 @@
 body {
     height: 100%;
 }
+
+#station {
+    position: absolute;
+    margin: 1em;
+}
+
+#station > .card {
+    overflow-y: scroll;
+}
+
+.indicator {
+    width: 50px;
+    margin-right: 0.5em;
+}
