@@ -148,8 +148,8 @@ const map = new maptilersdk.Map({
 // CHARTS
 
 async function update() {
-  var last = await (await fetch('http://api.aereni.atelierso.fr/stats/last_measurement?production=true')).json();
-  var history = await (await fetch('http://api.aereni.atelierso.fr/stats/history/14')).json();
+  var last = await (await fetch('https://api.aereni.atelierso.fr/stats/last_measurement?production=true')).json();
+  var history = await (await fetch('https://api.aereni.atelierso.fr/stats/history/14')).json();
   treatData(map, last[0], history);
 }
 
