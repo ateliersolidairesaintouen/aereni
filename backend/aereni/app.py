@@ -20,7 +20,7 @@ def create_app():
 
     sqlite.init_app(app)
     influx.init_app(app)
-    CORS(app, expose_headers=['X-Total-Count', 'Authorization'], supports_credentials=True)
+    #CORS(app, expose_headers=['X-Total-Count', 'Authorization'], supports_credentials=True)
     app.register_blueprint(ingest_blueprint)
     app.register_blueprint(stats_blueprint)
     app.register_blueprint(inventory_blueprint)
