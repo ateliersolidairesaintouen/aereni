@@ -154,15 +154,14 @@ var mapHeight = () => {
   console.log(windowHeight - navHeight)
 };
 
-window.addEventListener('load', mapHeight);
-window.addEventListener('resize', mapHeight);
+//window.addEventListener('resize', mapHeight);
 
 const map = new maptilersdk.Map({
   container: 'map', // container's id or the HTML element in which the SDK will render the map
   style: maptilersdk.MapStyle.STREETS,
   center: [2.3342069, 48.9105859], // starting position [lng, lat]
   zoom: 14 // starting zoom
-});
+}).setMinZoom(13);
 
 // CHARTS
 
