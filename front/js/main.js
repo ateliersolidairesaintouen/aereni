@@ -25,11 +25,26 @@ var formatDate = (str) => {
 
 var getIndicator = (type, value) => {
   var pngs = {
-    level1: "/assets/good.png",
-    level2: "/assets/ok.png",
-    level3: "/assets/bof.png",
-    level4: "/assets/bad.png",
-    level5: "/assets/verybad.png"
+    level1: {
+      img: "/assets/good.png",
+      color: "#53B260"
+    },
+    level2: {
+      img: "/assets/ok.png",
+      color: "#A2CB76",
+    },
+    level3: {
+      img: "/assets/bof.png",
+      color: "#FBBD54",
+    },
+    level4: {
+      img: "/assets/bad.png",
+      color: "#EE733E",
+    },
+    level5: {
+      img: "/assets/verybad.png",
+      color: "#E63C34",
+    }
   }
 
   if (type == "pm25") {
@@ -84,11 +99,15 @@ var treatData = (map, last, history) => {
   temperature.innerText = last.temperature + "°C";
   humidity.innerText = last.humidity + " %";
 
-  indicator.setAttribute("src", getIndicator("pm10", last.pm10))
+  var ind = getIndicator("pm10", last.pm10);
 
-  const marker = new maptilersdk.Marker()
-    .setLngLat([last.lon, last.lat])
+  indicator.setAttribute("src", ind.img);
+
+  const marker = new maptilersdk.Marker({
+    color: ind.color
+  }).setLngLat([last.lon, last.lat])
     .addTo(map);
+
 
   const pm10Chart = new Chart(
       document.getElementById("pm10-chart"),
