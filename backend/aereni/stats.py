@@ -98,11 +98,11 @@ def api_history(id: str):
     station = get_station_by_id(id)
     if not station: abort(404)
 
-    duration = request.args.get("duration", "10m", type=str)
+    duration = request.args.get("duration", "24h", type=str)
 
     query_api = influx.query_api()
 
-    results = query_api.query(f'from(bucket: "aereni") |> range(start: -{duration}) |> filter(fn: (r) => r["_measurement"] == "test") |> filter(fn: (r) => r["station_id"] == "{id}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
+    results = query_api.query(f'from(bucket: "aereni") |> range(start: -{duration})|> filter(fn: (r) => r["station_id"] == "{id}") |> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pm10" or r["_field"] == "pm25" or r["_field"] == "pressure" or r["_field"] == "temperature") |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") |> yield()').to_values(columns=["pm25", "pm10", "humidity", "temperature", "pressure", "esp_id", "_time"])
 
     data = []
     for r in results:
