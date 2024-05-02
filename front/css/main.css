@@ -7,16 +7,25 @@ body {
 }
 
 #station {
-    position: absolute;
-    margin: 1em;
-}
-
-#station > .card {
-    height: calc(100vh - 60px - 2em);
+    height: calc(100vh - 60px);
     overflow-y: scroll;
+    margin: 0;
+    border: 0;
+    padding: 0;
 }
 
 .indicator {
     width: 50px;
     margin-right: 0.5em;
+}
+
+
+@media only screen and (max-width: 720px) {
+    #station {
+        height: calc(50vh - 60px);
+    }
+
+    #map {
+        height: calc(50vh - 60px);
+    }
 }

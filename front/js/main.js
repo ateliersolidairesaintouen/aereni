@@ -15,34 +15,49 @@ const pm25 = document.getElementById("pm25");
 const temperature = document.getElementById("temperature");
 const humidity = document.getElementById("humidity");
 
+// Markers and graphs
+let markers = [];
+let pm10Chart;
+let pm25Chart;
+
 var formatDate = (str) => {
   var date = new Date(str);
   var hour = date.getHours();
   var minutes = date.getMinutes();
-  console.log(date, hour, minutes);
   return hour + ":" + minutes;
+}
+
+var getIndicatorImgElement = (src) => {
+  let elmt = new Image(50, 50);
+  elmt.src = src;
+  return elmt;
 }
 
 var getIndicator = (type, value) => {
   var pngs = {
     level1: {
       img: "/assets/good.png",
+      cloud: "/assets/cloud-good.png",
       color: "#53B260"
     },
     level2: {
       img: "/assets/ok.png",
+      cloud: "/assets/cloud-ok.png",
       color: "#A2CB76",
     },
     level3: {
       img: "/assets/bof.png",
+      cloud: "/assets/cloud-bof.png",
       color: "#FBBD54",
     },
     level4: {
       img: "/assets/bad.png",
+      cloud: "/assets/cloud-bad.png",
       color: "#EE733E",
     },
     level5: {
       img: "/assets/verybad.png",
+      cloud: "/assets/cloud-verybad.png",
       color: "#E63C34",
     }
   }
@@ -91,55 +106,67 @@ var simplifyDataset = (list) => {
 }
 
 var treatData = (map, last, history) => {
-  var dataset = simplifyDataset(history.data);
+    var dataset = simplifyDataset(history.data);
 
-  stationName.innerText = last.name;
-  pm10.innerText = last.pm10 + " µg/m³";
-  pm25.innerText = last.pm25 + " µg/m³";
-  temperature.innerText = last.temperature + "°C";
-  humidity.innerText = last.humidity + " %";
+    stationName.innerText = last.name;
+    pm10.innerText = last.pm10 + " µg/m³";
+    pm25.innerText = last.pm25 + " µg/m³";
+    temperature.innerText = last.temperature + "°C";
+    humidity.innerText = last.humidity + " %";
 
-  var ind = getIndicator("pm10", last.pm10);
+    var ind = getIndicator("pm10", last.pm10);
 
-  indicator.setAttribute("src", ind.img);
+    indicator.setAttribute("src", ind.img);
 
-  const marker = new maptilersdk.Marker({
-    color: ind.color
-  }).setLngLat([last.lon, last.lat])
-    .addTo(map);
-
-
-  const pm10Chart = new Chart(
-      document.getElementById("pm10-chart"),
-      {
-        type: "line",
-        data: {
-          labels: dataset.map(obj => formatDate(obj.date)),
-          datasets: [
-            {
-              label: "Mesure PM10",
-              data: dataset.map(obj => obj.pm10)
-            }
-          ]
-        }
-      }
-    );
-
-  const pm125hart = new Chart(
-    document.getElementById("pm25-chart"),
-    {
-      type: "line",
-      data: {
-        labels: dataset.map(obj => formatDate(obj.date)),
-        datasets: [
-          {
-            label: "Mesure PM25 ",
-            data: dataset.map(obj => obj.pm25)
-          }
-        ]
-      }
+    if (markers.length == 0) {
+      markers.push(new maptilersdk.Marker({
+        element: getIndicatorImgElement(ind.cloud)
+      }).setLngLat([last.lon, last.lat])
+        .addTo(map));
     }
-  );
+
+    if (pm10Chart == undefined) {
+      pm10Chart = new Chart(
+        document.getElementById("pm10-chart"),
+        {
+          type: "line",
+          data: {
+            labels: dataset.map(obj => formatDate(obj.date)),
+            datasets: [
+              {
+                label: "Mesure PM10",
+                data: []
+              }
+            ]
+          }
+        }
+      );
+    }
+
+    pm10Chart.data.datasets[0].data = dataset.map(obj => obj.pm10);
+    pm10Chart.update();
+
+    if (pm25Chart == undefined) {
+      pm25Chart = new Chart(
+        document.getElementById("pm25-chart"),
+        {
+          type: "line",
+          data: {
+            labels: dataset.map(obj => formatDate(obj.date)),
+            datasets: [
+              {
+                label: "Mesure PM2,5 ",
+                data: []
+              }
+            ]
+          }
+        }
+      );
+    }
+
+    pm25Chart.data.datasets[0].data = dataset.map(obj => obj.pm25);
+    pm25Chart.update();
+
 };
 
 var about = () => {
@@ -166,9 +193,11 @@ const map = new maptilersdk.Map({
 // CHARTS
 
 async function update() {
+  console.log("Top!")
   var last = await (await fetch('https://api.aereni.atelierso.fr/stats/last_measurement?production=true')).json();
   var history = await (await fetch('https://api.aereni.atelierso.fr/stats/history/14')).json();
   treatData(map, last[0], history);
 }
 
-update();
+update()
+let cron = setInterval(update,3000);
