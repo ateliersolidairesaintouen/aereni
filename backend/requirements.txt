@@ -1,9 +1,8 @@
 certifi==2021.10.8
 charset-normalizer==2.0.7
 click==8.0.3
-Flask==2.0.2
+Flask==2.0.3
 Flask-Cors==3.0.10
-Flask-InfluxDB==0.3.3
 Flask-SQLAlchemy==2.5.1
 greenlet==1.1.2
 idna==3.2
@@ -20,3 +19,4 @@ SQLAlchemy==1.4.25
 SQLAlchemy-Utils==0.37.9
 urllib3==1.26.7
 Werkzeug==2.0.2
+influxdb-flask==0.1.2

@@ -49,22 +49,14 @@ class Station(sqlite.Model):
 
 def setup_inventory():
     sqlite.create_all()
-    #### test data ###
-    s1 = Station(
-        name='Station 11',
-        id='11', esp_id='15002893',
-        indoor=True, production=False,
-        node_id="3435468416864",
-        user='barth', address="XXXXX",
-        lat=42.0, lon=42.0, floor=5
-    )
-    sqlite.session.add(s1)
     sqlite.session.commit()
 
 
 def get_station_by_esp_id(esp_id: str) -> Station:
     return sqlite.session.query(Station).filter_by(esp_id=esp_id).first()
 
+def get_station_by_id(id: str) -> Station:
+    return sqlite.session.query(Station).filter_by(id=id).first()
 
 @inventory_blueprint.get("/inventory/stations")
 def api_list_stations():
