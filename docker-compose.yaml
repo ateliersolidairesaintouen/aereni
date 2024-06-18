@@ -8,7 +8,7 @@ services:
       - GF_SERVER_ROOT_URL=http://my.grafana.server/
       - GF_INSTALL_PLUGINS=grafana-clock-panel
     ports:
-     - '3000:3000'
+     - '3030:3000'
     volumes:
       - grafana-storage:/var/lib/grafana
   influxdb:
@@ -26,6 +26,16 @@ services:
       - '8086:8086'
     volumes:
       - ./influxdb:/var/lib/influxdb
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=#CHANGEME#
+      - POSTGRES_USER=atso
+      - POSTGRES_DB=aereni
 
 volumes:
   grafana-storage: { }
