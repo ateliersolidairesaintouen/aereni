@@ -3,64 +3,64 @@ from dataclasses import dataclass
 from flask import Blueprint, request, jsonify, make_response
 from sqlalchemy.exc import SQLAlchemyError
 
-from aereni.databases import sqlite
+from aereni.databases import postgresql
 
 inventory_blueprint = Blueprint('inventory', __name__)
 
 
 @dataclass
-class Station(sqlite.Model):
+class Station(postgresql.Model):
     __tablename__ = 'station'
 
     # uniquely identify a station
-    id: str = sqlite.Column(sqlite.String, primary_key=True)
+    id: str = postgresql.Column(postgresql.String, primary_key=True)
 
     # name of the Station
-    name: str = sqlite.Column(sqlite.String, unique=True, nullable=False)
+    name: str = postgresql.Column(postgresql.String, unique=True, nullable=False)
 
     # esp_id depends on the current esp installed in the station, it can vary if we replace the esp after a failure
-    esp_id: str = sqlite.Column(sqlite.String, unique=True, nullable=False)
+    esp_id: str = postgresql.Column(postgresql.String, unique=True, nullable=False)
 
     # sensebox_id as defined in opensensemap platform
-    sensebox_id: str = sqlite.Column(sqlite.String, unique=True, nullable=True)
+    sensebox_id: str = postgresql.Column(postgresql.String, unique=True, nullable=True)
 
     # a node_id uniquely identify a location where we installed a station
-    node_id: str = sqlite.Column(sqlite.String, unique=True, nullable=True)
+    node_id: str = postgresql.Column(postgresql.String, unique=True, nullable=True)
 
     # identify the owner of the node (!= owner of the Station)
-    user: str = sqlite.Column(sqlite.String, unique=False, nullable=True)
-    address: str = sqlite.Column(sqlite.String, unique=False, nullable=True)
-    floor: int = sqlite.Column(sqlite.Integer, unique=False, nullable=True)
-    lat: float = sqlite.Column(sqlite.Numeric, unique=False, nullable=True)
-    lon: float = sqlite.Column(sqlite.Numeric, unique=False, nullable=True)
-    indoor: bool = sqlite.Column(sqlite.Boolean, unique=False, nullable=True)
+    user: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
+    address: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
+    floor: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
+    lat: float = postgresql.Column(postgresql.Numeric, unique=False, nullable=True)
+    lon: float = postgresql.Column(postgresql.Numeric, unique=False, nullable=True)
+    indoor: bool = postgresql.Column(postgresql.Boolean, unique=False, nullable=True)
 
     # if true, the data-points emitted by the station are considered real
-    production: bool = sqlite.Column(sqlite.Boolean, unique=False, nullable=False, default=False)
+    production: bool = postgresql.Column(postgresql.Boolean, unique=False, nullable=False, default=False)
 
     # identify the owner of the station (e.g atso, ben...)
-    owner: str = sqlite.Column(sqlite.String, unique=False, nullable=False, default="ATSO")
+    owner: str = postgresql.Column(postgresql.String, unique=False, nullable=False, default="ATSO")
 
-    comment: str = sqlite.Column(sqlite.String, unique=False, nullable=True, default="")
+    comment: str = postgresql.Column(postgresql.String, unique=False, nullable=True, default="")
 
     def __repr__(self):
         return '<Station %r>' % self.name
 
 
 def setup_inventory():
-    sqlite.create_all()
-    sqlite.session.commit()
+    postgresql.create_all()
+    postgresql.session.commit()
 
 
 def get_station_by_esp_id(esp_id: str) -> Station:
-    return sqlite.session.query(Station).filter_by(esp_id=esp_id).first()
+    return postgresql.session.query(Station).filter_by(esp_id=esp_id).first()
 
 def get_station_by_id(id: str) -> Station:
-    return sqlite.session.query(Station).filter_by(id=id).first()
+    return postgresql.session.query(Station).filter_by(id=id).first()
 
 @inventory_blueprint.get("/inventory/stations")
 def api_list_stations():
-    all_stations = sqlite.session.query(Station).all()
+    all_stations = postgresql.session.query(Station).all()
     resp = make_response(jsonify(all_stations))
     resp.headers['X-Total-Count'] = len(all_stations)
     return resp
@@ -68,7 +68,7 @@ def api_list_stations():
 
 @inventory_blueprint.get("/inventory/stations/<id>")
 def api_get_station(id: str):
-    station = sqlite.session.query(Station).get(id)
+    station = postgresql.session.query(Station).get(id)
     if station is None:
         return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
     return jsonify(station)
@@ -81,8 +81,8 @@ def api_create_station():
 
     try:
         station = Station(**request.json)
-        sqlite.session.add(station)
-        sqlite.session.commit()
+        postgresql.session.add(station)
+        postgresql.session.commit()
     except SQLAlchemyError as e:
         return jsonify({"error": 400, "message": str(e)}), 400
 
@@ -94,7 +94,7 @@ def api_partial_update_station(id: str):
     if not request.is_json:
         return jsonify({"error": 400, "message": "Invalid request"}), 400
 
-    station = sqlite.session.query(Station).get(id)
+    station = postgresql.session.query(Station).get(id)
     if station is None:
         return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
 
@@ -104,7 +104,7 @@ def api_partial_update_station(id: str):
         setattr(station, key, value)
 
     try:
-        sqlite.session.commit()
+        postgresql.session.commit()
     except SQLAlchemyError as e:
         return jsonify({"error": 400, "message": str(e)}), 400
 
@@ -117,7 +117,7 @@ def api_delete_station(id: str):
     if count == 0:
         return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
     try:
-        sqlite.session.commit()
+        postgresql.session.commit()
     except SQLAlchemyError as e:
         return jsonify({"error": 400, "message": str(e)}), 400
     return jsonify({"status": "success"})
