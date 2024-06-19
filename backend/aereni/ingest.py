@@ -34,15 +34,15 @@ class Measurement(postgresql.Model):
     __tablename__ = 'measurement'
 
     id: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    pm25: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
-    pm10: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
-    humidity: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
-    temperature: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
-    pressure: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
-    datetime: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
+    pm25: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
+    pm10: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
+    humidity: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
+    temperature: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
+    pressure: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
+    datetime: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
 
     esp_id: float = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    station_id: float = postgresql.Column(postgresql.Real, unique=False, nullable=True)
+    station_id: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
     production: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
     indoor: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
 
