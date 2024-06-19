@@ -163,7 +163,7 @@ def api_ingest():
             write_to_postgresql(data_point, station)
             return jsonify({"status": "success"})
         except SQLAlchemyError as e:
-            raise jsonify({"error": 400, "message": str(e)}), 400
+            return jsonify({"error": 400, "message": str(e)}), 400
 
     except Exception as e:
         print("!!!!!! INGEST ERROR !!!!!! please fix !!!! <3")
