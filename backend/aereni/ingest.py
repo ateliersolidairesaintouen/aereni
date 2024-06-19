@@ -33,7 +33,7 @@ class DataPoint:
 class Measurement(postgresql.Model):
     __tablename__ = 'measurement'
 
-    id: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
+    id: int = postgresql.Column(postgresql.Integer, primary_key=True)
     pm25: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
     pm10: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
     humidity: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
