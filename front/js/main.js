@@ -201,9 +201,17 @@ async function update(go) {
           last: last[0],
           history: history
         })
+      }).catch(e => {
+        console.log(e)
       })
+    }).catch(e => {
+      console.log(e)
     })
+  }).catch(e => {
+    console.log(e)
   })
+}).catch(e => {
+  console.log(e)
 })
 }
 
