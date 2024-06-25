@@ -3,48 +3,9 @@ from dataclasses import dataclass
 from flask import Blueprint, request, jsonify, make_response
 from sqlalchemy.exc import SQLAlchemyError
 
-from aereni.databases import postgresql
+from aereni.databases import postgresql, Station
 
 inventory_blueprint = Blueprint('inventory', __name__)
-
-
-@dataclass
-class Station(postgresql.Model):
-    __tablename__ = 'station'
-
-    # uniquely identify a station
-    id: str = postgresql.Column(postgresql.String, primary_key=True)
-
-    # name of the Station
-    name: str = postgresql.Column(postgresql.String, unique=True, nullable=False)
-
-    # esp_id depends on the current esp installed in the station, it can vary if we replace the esp after a failure
-    esp_id: str = postgresql.Column(postgresql.String, unique=True, nullable=False)
-
-    # sensebox_id as defined in opensensemap platform
-    sensebox_id: str = postgresql.Column(postgresql.String, unique=True, nullable=True)
-
-    # a node_id uniquely identify a location where we installed a station
-    node_id: str = postgresql.Column(postgresql.String, unique=True, nullable=True)
-
-    # identify the owner of the node (!= owner of the Station)
-    user: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
-    address: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
-    floor: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    lat: float = postgresql.Column(postgresql.Numeric, unique=False, nullable=True)
-    lon: float = postgresql.Column(postgresql.Numeric, unique=False, nullable=True)
-    indoor: bool = postgresql.Column(postgresql.Boolean, unique=False, nullable=True)
-
-    # if true, the data-points emitted by the station are considered real
-    production: bool = postgresql.Column(postgresql.Boolean, unique=False, nullable=False, default=False)
-
-    # identify the owner of the station (e.g atso, ben...)
-    owner: str = postgresql.Column(postgresql.String, unique=False, nullable=False, default="ATSO")
-
-    comment: str = postgresql.Column(postgresql.String, unique=False, nullable=True, default="")
-
-    def __repr__(self):
-        return '<Station %r>' % self.name
 
 
 def setup_inventory():

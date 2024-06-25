@@ -7,7 +7,7 @@ from typing import Dict
 from flask import Blueprint, jsonify, request
 from influxdb_client.client.write_api import SYNCHRONOUS
 from aereni.config import config
-from aereni.databases import influx, postgresql
+from aereni.databases import postgresql, Measurement, Station
 from aereni.inventory import get_station_by_esp_id, Station
 
 ingest_blueprint = Blueprint('ingest', __name__)
@@ -29,29 +29,6 @@ class DataPoint:
     # "signal" is the wifi strength
     signal: int = None
 
-@dataclass
-class Measurement(postgresql.Model):
-    __tablename__ = 'measurement'
-
-    id: int = postgresql.Column(postgresql.Integer, primary_key=True)
-    pm25: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    pm10: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    humidity: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    temperature: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    pressure: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    datetime: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-
-    esp_id: float = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    station_id: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
-    production: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    indoor: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-
-    # Monitoring
-    software_version: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
-    samples: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    signal: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    min_micro: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
-    max_micro: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
 
 
 def parse_esp_json(json: Dict) -> DataPoint:
@@ -80,48 +57,6 @@ def parse_esp_json(json: Dict) -> DataPoint:
 
     return p
 
-
-def write_to_influx(p: DataPoint, s: Station):
-    tags = {
-        "esp_id": s.esp_id,
-        "station_id": s.id,
-        "node_id": s.node_id,
-        "indoor": s.indoor,
-        "production": s.production,
-        "user": s.user,
-    }
-
-    point = [
-        {
-            "measurement": "production" if s.production else "test",
-            "fields": {
-                "pm25": p.pm25,
-                "pm10": p.pm10,
-                "temperature": p.temperature,
-                "humidity": p.humidity,
-                "pressure": p.pressure
-            },
-            "tags": tags
-        },
-        {
-            "measurement": "monitoring",
-            "fields": {
-                "software_version": p.software_version,
-                "signal": p.signal,
-                "min_micro": p.min_micro,
-                "max_micro": p.max_micro,
-                "samples": p.samples
-            },
-            "tags": tags
-        }
-    ]
-
-    write_api = influx.write_api(SYNCHRONOUS)
-    write_api.write(
-        config.bucket,
-        config.org,
-        point
-    )
 
 def write_to_postgresql(p: DataPoint, s: Station):
     date = None
