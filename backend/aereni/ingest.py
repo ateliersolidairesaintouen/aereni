@@ -1,5 +1,6 @@
 import traceback
 from dataclasses import dataclass
+from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from decimal import Decimal
 from typing import Dict
@@ -59,7 +60,7 @@ def parse_esp_json(json: Dict) -> DataPoint:
 
 
 def write_to_postgresql(p: DataPoint, s: Station):
-    date = None
+    date = datetime.now().timestamp()
     item = Measurement(
         pm25=p.pm25,
         pm10=p.pm10,
