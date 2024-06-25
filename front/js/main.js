@@ -192,11 +192,16 @@ const map = new maptilersdk.Map({
 
 // CHARTS
 
-async function update() {
-  console.log("Top!")
-  var last = await (await fetch('https://api.aereni.atelierso.fr/stats/last_measurement?production=true')).json();
-  var history = await (await fetch('https://api.aereni.atelierso.fr/stats/history/14')).json();
-  treatData(map, last[0], history);
+function update() {
+  fetch('https://api.aereni.atelierso.fr/stats/last_measurement?production=true').then(res => {
+    res.json().then(last => {
+      fetch('https://api.aereni.atelierso.fr/stats/history/14').then(res => {
+        res.json().then(history => {
+          treatData(map, last[0], history)
+        })
+      })
+    })
+  })
 }
 
 update()
