@@ -200,4 +200,3 @@ async function update() {
 }
 
 update()
-let cron = setInterval(update,3000);
