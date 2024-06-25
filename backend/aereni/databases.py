@@ -10,7 +10,7 @@ class Station(postgresql.Model):
     __tablename__ = 'station'
 
     # uniquely identify a station
-    id: str = postgresql.Column(postgresql.String, primary_key=True)
+    id: int = postgresql.Column(postgresql.String, primary_key=True)
 
     # name of the Station
     name: str = postgresql.Column(postgresql.String, unique=True, nullable=False)
@@ -57,7 +57,7 @@ class Measurement(postgresql.Model):
     pressure: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
     datetime: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
 
-    esp_id: float = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
+    esp_id: str = postgresql.Column(postgresql.String, unique=False, nullable=True)
     station_id: float = postgresql.Column(postgresql.Float, unique=False, nullable=True)
     production: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
     indoor: int = postgresql.Column(postgresql.Integer, unique=False, nullable=True)
