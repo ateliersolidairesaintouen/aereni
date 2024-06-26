@@ -27,8 +27,11 @@
 
     <div class="container-fluid" id="content">
         <div class="row">
-            <div class="col-12 col-md-9" id="map"></div>
+            <div class="col-12" id="map"></div>
             <div class="col-12 col-md-3" id="station">
+                <div class="card-body m-3"  style="text-align: right; float: right">
+                    <a onclick="closeDetails()" style="cursor:pointer;" >✕</a>
+                </div>
                 <div class="card-body m-3">
                     <h5 class="card-title d-flex align-items-center"><img src="assets/good.png" class="indicator" id="indicator" /> <span id="stationName">Atelier Solidaire - outdoor</span></h5>
                 </div>
@@ -85,7 +88,7 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.min.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="./js/app.js"></script>
 </body>
 
 </html>
