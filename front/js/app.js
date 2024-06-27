@@ -27,6 +27,7 @@ class MapView {
         if (this.markers.length == 0) {
             for (var i = 0; i < stations.length; ++i) {
                 var station = stations[i];
+                console.log(station)
                 var ind = utils.indicator("pm10", station.pm10);
                 this.markers.push(new maptilersdk.Marker({
                     element: utils.indicatorElement(ind.cloud, () => {
@@ -252,6 +253,7 @@ var init = () => {
         res.json().then(json => {
             var stations = json.map(val => new Station(val, details));
             var map = new MapView("0XwnxCtQlK7VSjPiB9Ea", details);
+            console.log(stations)
             map.addMarkers(stations);
         }).catch(error => console.log(error))
     }).catch(error => console.log(error))
