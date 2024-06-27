@@ -25,15 +25,20 @@ class MapView {
 
     addMarkers(stations) {
         if (this.markers.length == 0) {
-            for (var i = 0; i < stations.length; ++i) {
-                var station = stations[i];
-                console.log(station)
-                var ind = utils.indicator("pm10", station.pm10);
+            for (let i = 0; i < stations.length; ++i) {
+                let station = stations[i];
+                let ind = utils.indicator("pm10", station.pm10);
+                let [elmnt, id] = utils.indicatorElement(ind.cloud);
+
                 this.markers.push(new maptilersdk.Marker({
-                    element: utils.indicatorElement(ind.cloud, () => {
-                        station.more(json => this.details.view(json))
-                    })
+                    element: elmnt
                 }).setLngLat([station.lon, station.lat]).addTo(this.map));
+
+                document.getElementById(id).addEventListener('click', () => {
+                    station.more(json => {
+                        this.details.view(json)
+                    })
+                })
             }
         }
     }
@@ -63,11 +68,11 @@ class Details {
     }
 
     simplifyDataset(list) {
-        var lgth = list.length;
-        var part = Math.floor(lgth / 24);
+        let lgth = list.length;
+        let part = Math.floor(lgth / 24);
 
-        var u = 0;
-        var final = [];
+        let u = 0;
+        let final = [];
         while (u < lgth) {
             final.push(list[u]);
             u += part;
@@ -77,8 +82,8 @@ class Details {
     }
 
     view(history) {
-        var dataset = this.simplifyDataset(history.data);
-        var last_measure = history.data[0];
+        let dataset = this.simplifyDataset(history.data);
+        let last_measure = history.data[0];
 
         if (last_measure == undefined) return;
         this.DOMContainer.style.display = "block";
@@ -90,7 +95,7 @@ class Details {
         this.DOMTemperature.innerText = last_measure.temperature + "°C";
         this.DOMTemperature.innerText = last_measure.humidity + " %";
 
-        var ind = utils.indicator("pm10", last_measure.pm10);
+        let ind = utils.indicator("pm10", last_measure.pm10);
         this.DOMIndicator.setAttribute("src", ind.img);
 
         // Treating charts
@@ -163,9 +168,9 @@ class Station {
     }
 }
 
-var utils = {
+let utils = {
     indicator: (type, value) => {
-        var pngs = {
+        let pngs = {
             level1: {
                 img: "/assets/good.png",
                 cloud: "/assets/cloud-good.png",
@@ -219,26 +224,26 @@ var utils = {
             }
         }
     },
-    indicatorElement: (src, click) => {
+    indicatorElement: src => {
         let elmt = new Image(50, 50);
         elmt.src = src;
-        elmt.addEventListener('click', _ => click())
-        return elmt;
+        elmt.id = "ab-" + Math.floor(Math.random() * 1000);
+        return [elmt, elmt.id];
     },
     formatDate: (str) => {
-        var date = new Date(str * 1000);
-        var hour = new String(date.getHours()).padStart(2, '0');
-        var minutes = new String(date.getMinutes()).padStart(2, '0');
+        let date = new Date(str * 1000);
+        let hour = new String(date.getHours()).padStart(2, '0');
+        let minutes = new String(date.getMinutes()).padStart(2, '0');
         return hour + ":" + minutes;
     }
 }
 
-var closeDetails = () => {
+let closeDetails = () => {
     cardStation.style.display = "none";
 }
 
-var init = () => {
-    var details = new Details(
+let init = () => {
+    let details = new Details(
         cardStation,
         indicator,
         stationName,
@@ -251,9 +256,8 @@ var init = () => {
     )
     fetch(baseurl + '/stats/last_measurement?production=true').then(res => {
         res.json().then(json => {
-            var stations = json.map(val => new Station(val, details));
-            var map = new MapView("0XwnxCtQlK7VSjPiB9Ea", details);
-            console.log(stations)
+            let stations = json.map(val => new Station(val, details));
+            let map = new MapView("0XwnxCtQlK7VSjPiB9Ea", details);
             map.addMarkers(stations);
         }).catch(error => console.log(error))
     }).catch(error => console.log(error))
