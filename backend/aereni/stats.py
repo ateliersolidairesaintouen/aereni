@@ -92,7 +92,9 @@ def api_last_measurement():
                 'date': measure.datetime
             })
 
-    return jsonify(data)
+    res = make_response(jsonify(data))
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    return res
 
 @stats_blueprint.get("/stats/history/<id>")
 def api_history(id: str):
@@ -116,7 +118,7 @@ def api_history(id: str):
             'date': measure.datetime
         })
 
-    return jsonify({
+    res = make_response(jsonify({
         'id': station.id,
         'esp_id': station.esp_id,
         'address': station.address,
@@ -124,7 +126,9 @@ def api_history(id: str):
         'lon': station.lon,
         'lat': station.lat,
         'data': data
-    })
+    }))
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    return res
 
 
 @stats_blueprint.get("/stats/last_measurement_umap")
