@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/srv/aereni/backend/venv/bin/python -m aereni.app
+ExecStart=/home/ubuntu/.pyenv/versions/3.7.16/envs/aereni/bin/python -m aereni.app
 Restart=always
 User=ubuntu
 WorkingDirectory=/srv/aereni/backend/

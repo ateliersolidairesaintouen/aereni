@@ -1,4 +1,4 @@
-const baseurl = 'https://api.aereni.atelierso.fr'
+const baseurl = 'https://api.aereni.atelierso.fr';
 
 const cardStation = document.getElementById("station");
 const indicator = document.getElementById("indicator");
@@ -24,22 +24,25 @@ class MapView {
     }
 
     addMarkers(stations) {
-        if (this.markers.length == 0) {
-            for (let i = 0; i < stations.length; ++i) {
-                let station = stations[i];
-                let ind = utils.indicator("pm10", station.pm10);
-                let [elmnt, id] = utils.indicatorElement(ind.cloud);
+        if (this.markers.length > 0) return;
 
-                this.markers.push(new maptilersdk.Marker({
-                    element: elmnt
-                }).setLngLat([station.lon, station.lat]).addTo(this.map));
+        for (const station of stations) {
+            // Une station sans coordonnées ferait planter setLngLat
+            if (station.lon == null || station.lat == null) continue;
 
-                document.getElementById(id).addEventListener('click', () => {
-                    station.more(json => {
-                        this.details.view(json)
-                    })
-                })
-            }
+            const ind = utils.indicator("pm10", station.pm10);
+            const [elmnt] = utils.indicatorElement(ind.cloud);
+
+            // Écouteur attaché directement sur l'élément : plus besoin d'id
+            elmnt.addEventListener('click', () => {
+                station.more(json => this.details.view(json));
+            });
+
+            this.markers.push(
+                new maptilersdk.Marker({ element: elmnt })
+                    .setLngLat([Number(station.lon), Number(station.lat)])
+                    .addTo(this.map)
+            );
         }
     }
 }
@@ -68,72 +71,59 @@ class Details {
     }
 
     simplifyDataset(list) {
-        let lgth = list.length;
-        let part = Math.floor(lgth / 24);
+        const lgth = list.length;
+        // Math.max(1, ...) évite la boucle infinie s'il y a moins de 24 mesures
+        const part = Math.max(1, Math.floor(lgth / 24));
 
-        let u = 0;
-        let final = [];
-        while (u < lgth) {
+        const final = [];
+        for (let u = 0; u < lgth; u += part) {
             final.push(list[u]);
-            u += part;
         }
 
         return final.reverse();
     }
 
-    view(history) {
-        let dataset = this.simplifyDataset(history.data);
-        let last_measure = history.data[0];
+    buildChart(canvas, label) {
+        return new Chart(canvas, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{ label: label, data: [] }]
+            }
+        });
+    }
 
+    view(history) {
+        const last_measure = history.data[0];
         if (last_measure == undefined) return;
+
+        const dataset = this.simplifyDataset(history.data);
+        const labels = dataset.map(obj => utils.formatDate(obj.date));
+
         this.DOMContainer.style.display = "block";
 
-        // Treating sum up informations
+        // Résumé
         this.DOMStationName.innerText = history.name;
-        this.DOMPm10.innerText = last_measure.pm10 + " µg/m³";
-        this.DOMPm25.innerText = last_measure.pm25 + " µg/m³";
-        this.DOMTemperature.innerText = last_measure.temperature + "°C";
-        this.DOMTemperature.innerText = last_measure.humidity + " %";
+        this.DOMPm10.innerText = utils.format(last_measure.pm10, " µg/m³");
+        this.DOMPm25.innerText = utils.format(last_measure.pm25, " µg/m³");
+        this.DOMTemperature.innerText = utils.format(last_measure.temperature, "°C");
+        this.DOMHumidity.innerText = utils.format(last_measure.humidity, " %");
 
-        let ind = utils.indicator("pm10", last_measure.pm10);
+        const ind = utils.indicator("pm10", last_measure.pm10);
         this.DOMIndicator.setAttribute("src", ind.img);
 
-        // Treating charts
+        // Graphiques (créés une seule fois, puis mis à jour)
         if (this.pm10Chart == undefined) {
-            this.pm10Chart = new Chart(this.DOMPm10Chart, {
-                type: "line",
-                data: {
-                    labels: dataset.map(obj => utils.formatDate(obj.date)),
-                    datasets: [
-                        {
-                            label: "Mesure PM10",
-                            data: []
-                        }
-                    ]
-                }
-                }
-            );
+            this.pm10Chart = this.buildChart(this.DOMPm10Chart, "Mesure PM10");
         }
-
+        this.pm10Chart.data.labels = labels;
         this.pm10Chart.data.datasets[0].data = dataset.map(obj => obj.pm10);
         this.pm10Chart.update();
 
         if (this.pm25Chart == undefined) {
-            this.pm25Chart = new Chart(this.DOMPm25Chart, {
-                type: "line",
-                data: {
-                    labels: dataset.map(obj => utils.formatDate(obj.date)),
-                    datasets: [
-                        {
-                            label: "Mesure PM2,5 ",
-                            data: []
-                        }
-                    ]
-                }
-                }
-            );
+            this.pm25Chart = this.buildChart(this.DOMPm25Chart, "Mesure PM2,5");
         }
-
+        this.pm25Chart.data.labels = labels;
         this.pm25Chart.data.datasets[0].data = dataset.map(obj => obj.pm25);
         this.pm25Chart.update();
     }
@@ -155,22 +145,22 @@ class Station {
     }
 
     more(callback) {
-        fetch(baseurl + '/stats/history/' + this.id).then(res => {
-            res.json().then(json => {
+        fetch(baseurl + '/stats/history/' + this.id)
+            .then(res => {
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                return res.json();
+            })
+            .then(json => {
                 this.history = json;
                 callback(this.history);
-            }).catch(error => {
-                console.log(error)
             })
-        }).catch(error => {
-            console.log(error)
-        })
+            .catch(error => console.log(error));
     }
 }
 
 let utils = {
     indicator: (type, value) => {
-        let pngs = {
+        const pngs = {
             level1: {
                 img: "/assets/good.png",
                 cloud: "/assets/cloud-good.png",
@@ -196,54 +186,52 @@ let utils = {
                 cloud: "/assets/cloud-verybad.png",
                 color: "#E63C34",
             }
-        }
+        };
+
+        // Valeur absente : on retombe sur le niveau 1 pour ne pas planter
+        if (value == null) return pngs.level1;
 
         if (type == "pm25") {
-            if (value < 15) {
-                return pngs.level1;
-            } else if (15 <= value && value < 40) {
-                return pngs.level2;
-            } else if (40 <= value && value < 65) {
-                return pngs.level3;
-            } else if (65 <= value && value < 150) {
-                return pngs.level4;
-            } else if (150 <= value) {
-                return pngs.level5;
-            }
-            } else if (type == "pm10") {
-            if (value < 55) {
-                return pngs.level1;
-            } else if (55 <= value && value < 155) {
-                return pngs.level2;
-            } else if (155 <= value && value < 255) {
-                return pngs.level3;
-            } else if (255 <= value && value < 355) {
-                return pngs.level4;
-            } else if (355 <= value) {
-                return pngs.level5;
-            }
+            if (value < 15) return pngs.level1;
+            if (value < 40) return pngs.level2;
+            if (value < 65) return pngs.level3;
+            if (value < 150) return pngs.level4;
+            return pngs.level5;
         }
+
+        if (type == "pm10") {
+            if (value < 55) return pngs.level1;
+            if (value < 155) return pngs.level2;
+            if (value < 255) return pngs.level3;
+            if (value < 355) return pngs.level4;
+            return pngs.level5;
+        }
+
+        return pngs.level1;
     },
     indicatorElement: src => {
-        let elmt = new Image(50, 50);
+        const elmt = new Image(50, 50);
         elmt.src = src;
-        elmt.id = "ab-" + Math.floor(Math.random() * 1000);
-        return [elmt, elmt.id];
+        elmt.style.cursor = "pointer";
+        return [elmt];
+    },
+    format: (value, suffix) => {
+        return value == null ? "n/a" : value + suffix;
     },
     formatDate: (str) => {
-        let date = new Date(str * 1000);
-        let hour = new String(date.getHours()).padStart(2, '0');
-        let minutes = new String(date.getMinutes()).padStart(2, '0');
+        const date = new Date(str * 1000);
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
         return hour + ":" + minutes;
     }
-}
+};
 
 let closeDetails = () => {
     cardStation.style.display = "none";
-}
+};
 
 let init = () => {
-    let details = new Details(
+    const details = new Details(
         cardStation,
         indicator,
         stationName,
@@ -253,14 +241,19 @@ let init = () => {
         humidity,
         pm10Chart,
         pm25Chart
-    )
-    fetch(baseurl + '/stats/last_measurement?production=true').then(res => {
-        res.json().then(json => {
-            let stations = json.map(val => new Station(val, details));
-            let map = new MapView("0XwnxCtQlK7VSjPiB9Ea", details);
-            map.addMarkers(stations);
-        }).catch(error => console.log(error))
-    }).catch(error => console.log(error))
-}
+    );
 
-init()
+    fetch(baseurl + '/stats/last_measurement?production=true')
+        .then(res => {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
+        .then(json => {
+            const stations = json.map(val => new Station(val, details));
+            const map = new MapView("0XwnxCtQlK7VSjPiB9Ea", details);
+            map.addMarkers(stations);
+        })
+        .catch(error => console.log(error));
+};
+
+init();

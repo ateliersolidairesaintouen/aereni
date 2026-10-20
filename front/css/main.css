@@ -41,3 +41,30 @@ body {
         /*height: calc(50vh - 60px);*/
     }
 }
+.maplibregl-marker,
+.maptiler-marker {
+    cursor: pointer;
+}
+
+#map .maplibregl-canvas-container:active,
+#map .maplibregl-canvas-container:active .maplibregl-canvas {
+    cursor: grabbing;
+}
+
+.maplibregl-marker {
+    cursor: pointer;
+}
+
+#map .maplibregl-canvas-container,
+#map .maplibregl-canvas {
+    cursor: default;
+}
+
+#map .maplibregl-canvas-container:active,
+#map .maplibregl-canvas-container:active .maplibregl-canvas {
+    cursor: move;
+}
+
+.maplibregl-marker {
+    cursor: pointer;
+}

@@ -12,16 +12,15 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" id="nav">
+    <nav class="navbar bg-body-tertiary" id="nav">
         <div class="container-fluid">
             <a class="navbar-brand">Aereni</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <button class="nav-link" data-toggle="modal" data-target="#aboutmodal" >À propos</button>
-                    </li>
-                </ul>
-            </div>
+            <ul class="navbar-nav flex-row me-auto">
+                <li class="nav-item">
+                    <button type="button" class="nav-link btn btn-link" data-bs-toggle="modal"
+                        data-bs-target="#aboutmodal">À propos</button>
+                </li>
+            </ul>
         </div>
     </nav>
 
@@ -29,61 +28,62 @@
         <div class="row">
             <div class="col-12" id="map"></div>
             <div class="col-12 col-md-3" id="station">
-                <div class="card-body m-3"  style="text-align: right; float: right">
-                    <a onclick="closeDetails()" style="cursor:pointer;" >✕</a>
+                <div class="card-body m-3" style="text-align: right; float: right">
+                    <a onclick="closeDetails()" style="cursor:pointer;">✕</a>
                 </div>
                 <div class="card-body m-3">
-                    <h5 class="card-title d-flex align-items-center"><img src="assets/good.png" class="indicator" id="indicator" /> <span id="stationName">Atelier Solidaire - outdoor</span></h5>
+                    <h5 class="card-title d-flex align-items-center"><img src="assets/good.png" class="indicator"
+                            id="indicator" /> <span id="stationName">Atelier Solidaire - outdoor</span></h5>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <b>PM10</b>
-                        <span id="pm10" >0</span>
+                        <span id="pm10">0</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <b>PM25</b>
-                        <span id="pm25" >0</span>
+                        <span id="pm25">0</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <b>Température</b>
-                        <span id="temperature" >0</span>
+                        <span id="temperature">0</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <b>Humidité</b>
-                        <span id="humidity" >0</span>
+                        <span id="humidity">0</span>
                     </li>
                 </ul>
-                <div class="card-body border-bottom m-3" >
+                <div class="card-body border-bottom m-3">
                     <div style="width: 100%;"><canvas id="pm10-chart"></canvas></div>
                 </div>
 
-                <div class="card-body m-3" >
+                <div class="card-body m-3">
                     <div style="width: 100%;"><canvas id="pm25-chart"></canvas></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal" tabindex="-1" role="dialog" id="aboutmodal">
-        <div class="modal-dialog" role="document">
+    <div class="modal" tabindex="-1" id="aboutmodal">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Aereni · À propos</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Aereni est un projet de mesure de la pollution sur Saint-Ouen. Des habitants ont accepté d'accueillir chez eux des petites machines qui mesurent et envoient en temps réel la qualité de l'air.</p>
+                    <p>Aereni est un projet de mesure de la pollution sur Saint-Ouen. Des habitants ont accepté
+                        d'accueillir chez eux des petites machines qui mesurent et envoient en temps réel la qualité de
+                        l'air.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js "></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>

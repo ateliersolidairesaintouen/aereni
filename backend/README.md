@@ -44,7 +44,7 @@ Same as `/stats/last_measurement` but compatible with the [umap library platefor
 Requirements :
 - python >= 3.6 (tested with 3.10)
 - pip and virtualenv
-- influxdb 1.8
+- postgresql
 
 Create / load virtualenv :
 

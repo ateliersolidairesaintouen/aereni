@@ -1,11 +1,4 @@
 SECRET_KEY = 'cxcv'
 DEBUG = True
 
-INFLUXDB_V2_BUCKET = ''
-INFLUXDB_V2_ORG = ''
-INFLUXDB_V2_URL = 'http://localhost:8086'
-INFLUXDB_V2_ORG = 'atso'
-INFLUXDB_V2_TOKEN = ''
-INFLUXDB_V2_VERIFY_SSL = 'false'
-
 SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@host:5433/aereni'

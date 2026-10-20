@@ -1,9 +1,8 @@
-from influxdb_flask import InfluxDB
 from flask_sqlalchemy import SQLAlchemy
 from dataclasses import dataclass
 
 postgresql = SQLAlchemy()
-influx = InfluxDB()
+
 
 @dataclass
 class Station(postgresql.Model):
@@ -42,7 +41,6 @@ class Station(postgresql.Model):
 
     def __repr__(self):
         return '<Station %r>' % self.name
-
 
 
 @dataclass

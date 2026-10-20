@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from flask import Blueprint, request, jsonify, make_response
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -16,8 +14,10 @@ def setup_inventory():
 def get_station_by_esp_id(esp_id: str) -> Station:
     return postgresql.session.query(Station).filter_by(esp_id=esp_id).first()
 
+
 def get_station_by_id(id: str) -> Station:
     return postgresql.session.query(Station).filter_by(id=id).first()
+
 
 @inventory_blueprint.get("/inventory/stations")
 def api_list_stations():
@@ -44,7 +44,11 @@ def api_create_station():
         station = Station(**request.json)
         postgresql.session.add(station)
         postgresql.session.commit()
+    except TypeError as e:
+        # clé inconnue dans le JSON
+        return jsonify({"error": 400, "message": str(e)}), 400
     except SQLAlchemyError as e:
+        postgresql.session.rollback()
         return jsonify({"error": 400, "message": str(e)}), 400
 
     return jsonify(station)
@@ -59,14 +63,20 @@ def api_partial_update_station(id: str):
     if station is None:
         return jsonify({"error": 404, "message": f"There is no station with id={id}"}), 404
 
-    for key, value in request.json.items():
+    # On valide toutes les clés avant de modifier quoi que ce soit
+    for key in request.json:
         if not hasattr(station, key):
-            return jsonify({"error": 400, "message": f"Station has no attribute '{key}'"})
+            return jsonify({"error": 400, "message": f"Station has no attribute '{key}'"}), 400
+        if key == 'id':
+            return jsonify({"error": 400, "message": "The station id cannot be changed"}), 400
+
+    for key, value in request.json.items():
         setattr(station, key, value)
 
     try:
         postgresql.session.commit()
     except SQLAlchemyError as e:
+        postgresql.session.rollback()
         return jsonify({"error": 400, "message": str(e)}), 400
 
     return jsonify(station)
@@ -80,5 +90,6 @@ def api_delete_station(id: str):
     try:
         postgresql.session.commit()
     except SQLAlchemyError as e:
+        postgresql.session.rollback()
         return jsonify({"error": 400, "message": str(e)}), 400
     return jsonify({"status": "success"})
