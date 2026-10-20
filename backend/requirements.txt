@@ -18,3 +18,4 @@ SQLAlchemy==1.4.25
 SQLAlchemy-Utils==0.37.9
 urllib3==1.26.7
 Werkzeug==2.0.2
+psycopg2-binary==2.9.9

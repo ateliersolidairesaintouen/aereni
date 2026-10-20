@@ -1,0 +1,11 @@
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+*.cfg
+!*.cfg.example
+*.md

@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: aereni-pg
+    restart: unless-stopped
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD to .env}
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_DB=${POSTGRES_DB:-aereni}
+    ports:
+      - '127.0.0.1:5433:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    image: aereni-backend
+    container_name: aereni-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/aereni.docker.cfg:/config/aereni.cfg:ro
+    ports:
+      - '127.0.0.1:5000:5000'
+
+  front:
+    build: ./front
+    image: aereni-front
+    container_name: aereni-front
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8089:80'
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: aereni-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost
+        #      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    ports:
+      - '127.0.0.1:3030:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage: { }
