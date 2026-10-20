@@ -32,14 +32,21 @@ class DataPoint:
 
 
 
+# Particle sensors supported by the airRohr firmware, as named in its
+# "sensordatavalues": SDS011 (SDS_), Plantower PMS1003 to PMS7003 (PMS_).
+# P1 is PM10 and P2 is PM2.5 for every sensor.
+PM10_VALUE_TYPES = ('SDS_P1', 'PMS_P1')
+PM25_VALUE_TYPES = ('SDS_P2', 'PMS_P2')
+
+
 def parse_esp_json(json: Dict) -> DataPoint:
     """map a json, as sent by the esp, into a proper python object"""
     p = DataPoint(esp_id=json['esp8266id'], software_version=json['software_version'])
 
     for data_value in json['sensordatavalues']:
-        if data_value['value_type'] == 'SDS_P1':
+        if data_value['value_type'] in PM10_VALUE_TYPES:
             p.pm10 = Decimal(data_value['value'])
-        elif data_value['value_type'] == 'SDS_P2':
+        elif data_value['value_type'] in PM25_VALUE_TYPES:
             p.pm25 = Decimal(data_value['value'])
         elif data_value['value_type'] in ('BME280_temperature', 'BMP_temperature', 'temperature'):
             p.temperature = Decimal(data_value['value'])
