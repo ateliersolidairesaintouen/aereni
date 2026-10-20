@@ -26,7 +26,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./backend/aereni.docker.cfg:/config/aereni.cfg:ro
+      - ./backend/aereni.cfg:/config/aereni.cfg:ro
     ports:
       - '127.0.0.1:5000:5000'
 
